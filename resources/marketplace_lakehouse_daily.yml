@@ -1,0 +1,384 @@
+resources:
+  jobs:
+    marketplace_lakehouse_daily:
+      name: marketplace_lakehouse_daily
+      notification_settings:
+        no_alert_for_skipped_runs: true
+        no_alert_for_canceled_runs: true
+      timeout_seconds: 3600
+      health:
+        rules:
+          - metric: RUN_DURATION_SECONDS
+            op: GREATER_THAN
+            value: 1200
+      schedule:
+        quartz_cron_expression: 15 0 2 * * ?
+        timezone_id: Europe/Budapest
+        pause_status: PAUSED
+      tasks:
+        - task_key: register_run
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/60_register_run.py
+            base_parameters:
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 60000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 300
+        - task_key: bronze_orders
+          depends_on:
+            - task_key: register_run
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/61_bronze_job_task.py
+            base_parameters:
+              dataset: orders
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+              run_id: "{{tasks.register_run.values.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: bronze_payments
+          depends_on:
+            - task_key: register_run
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/61_bronze_job_task.py
+            base_parameters:
+              dataset: payments
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+              run_id: "{{tasks.register_run.values.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: bronze_products
+          depends_on:
+            - task_key: register_run
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/61_bronze_job_task.py
+            base_parameters:
+              dataset: products
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+              run_id: "{{tasks.register_run.values.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: bronze_sellers
+          depends_on:
+            - task_key: register_run
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/61_bronze_job_task.py
+            base_parameters:
+              dataset: sellers
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+              run_id: "{{tasks.register_run.values.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 300000
+          disable_auto_optimization: false
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: bronze_user_events
+          depends_on:
+            - task_key: register_run
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/61_bronze_job_task.py
+            base_parameters:
+              dataset: user_events
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+              run_id: "{{tasks.register_run.values.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: silver_setup
+          depends_on:
+            - task_key: bronze_products
+            - task_key: bronze_payments
+            - task_key: bronze_orders
+            - task_key: bronze_user_events
+            - task_key: bronze_sellers
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/62_silver_setup.py
+            base_parameters:
+              run_id: "{{tasks.register_run.values.run_id}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 600
+          environment_key: Default
+        - task_key: silver_sellers
+          depends_on:
+            - task_key: silver_setup
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/63_silver_job_task.py
+            base_parameters:
+              dataset: sellers
+              run_id: "{{tasks.register_run.values.run_id}}"
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 900
+          environment_key: Default
+        - task_key: silver_products
+          depends_on:
+            - task_key: silver_sellers
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/63_silver_job_task.py
+            base_parameters:
+              dataset: products
+              run_id: "{{tasks.register_run.values.run_id}}"
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 900
+          environment_key: Default
+        - task_key: silver_orders
+          depends_on:
+            - task_key: silver_products
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/63_silver_job_task.py
+            base_parameters:
+              dataset: orders
+              run_id: "{{tasks.register_run.values.run_id}}"
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: silver_payments
+          depends_on:
+            - task_key: silver_orders
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/63_silver_job_task.py
+            base_parameters:
+              dataset: payments
+              run_id: "{{tasks.register_run.values.run_id}}"
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: silver_user_events
+          depends_on:
+            - task_key: silver_orders
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/63_silver_job_task.py
+            base_parameters:
+              dataset: user_events
+              run_id: "{{tasks.register_run.values.run_id}}"
+              effective_source_set: "{{tasks.register_run.values.effective_source_set}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: silver_validate
+          depends_on:
+            - task_key: silver_payments
+            - task_key: silver_user_events
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/64_silver_validate.py
+            base_parameters:
+              run_id: "{{tasks.register_run.values.run_id}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 900
+          environment_key: Default
+        - task_key: data_quality
+          depends_on:
+            - task_key: silver_validate
+          notebook_task:
+            notebook_path: ../notebooks/operations/82_run_data_quality.py
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 900
+        - task_key: gold_dimensions
+          depends_on:
+            - task_key: data_quality
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/70_gold_dimensions.py
+            base_parameters:
+              run_id: "{{tasks.register_run.values.run_id}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: gold_order_facts
+          depends_on:
+            - task_key: gold_dimensions
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/71_gold_order_facts.py
+            base_parameters:
+              run_id: "{{tasks.register_run.values.run_id}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: gold_other_facts
+          depends_on:
+            - task_key: gold_order_facts
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/72_gold_other_facts.py
+            base_parameters:
+              run_id: "{{tasks.register_run.values.run_id}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: gold_aggregates
+          depends_on:
+            - task_key: gold_other_facts
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/73_gold_aggregates.py
+            base_parameters:
+              run_id: "{{tasks.register_run.values.run_id}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 1800
+          environment_key: Default
+        - task_key: gold_validate
+          depends_on:
+            - task_key: gold_aggregates
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/74_gold_validate.py
+            base_parameters:
+              run_id: "{{tasks.register_run.values.run_id}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 900
+          environment_key: Default
+        - task_key: publish_result
+          depends_on:
+            - task_key: gold_validate
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/75_publish_result.py
+            base_parameters:
+              run_id: "{{tasks.register_run.values.run_id}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 120000
+          retry_on_timeout: true
+          disable_auto_optimization: true
+          timeout_seconds: 300
+          health:
+            rules:
+              - metric: RUN_DURATION_SECONDS
+                op: GREATER_THAN
+                value: 300
+          environment_key: Default
+        - task_key: failure_handler
+          depends_on:
+            - task_key: gold_validate
+            - task_key: publish_result
+          run_if: AT_LEAST_ONE_FAILED
+          notebook_task:
+            notebook_path: ../notebooks/pipeline/76_failure_handler.py
+            base_parameters:
+              run_id: "{{tasks.register_run.values.run_id}}"
+              task_run_id: "{{task.run_id}}"
+            source: WORKSPACE
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          timeout_seconds: 300
+          environment_key: Default
+      queue:
+        enabled: true
+      parameters:
+        - name: data_scale
+          default: development
+        - name: end_date
+          default: ""
+        - name: environment
+          default: dev
+        - name: job_id
+          default: "{{job.id}}"
+        - name: job_run_id
+          default: "{{job.run_id}}"
+        - name: load_date
+          default: "{{job.trigger.time.iso_date}}"
+        - name: mode
+          default: incremental
+        - name: repair_count
+          default: "{{job.repair_count}}"
+        - name: source_set
+          default: all
+        - name: start_date
+          default: ""
+      run_as:
+        service_principal_name: ${var.job_service_principal}
+      environments:
+        - environment_key: Default
+          spec:
+            environment_version: "6"
+      performance_target: PERFORMANCE_OPTIMIZED
