@@ -1,0 +1,29 @@
+resources:
+  jobs:
+    marketplace_smoke_test:
+      name: marketplace-smoke-${bundle.target}
+      description: Post-deployment smoke test for the Marketplace Lakehouse bundle
+      max_concurrent_runs: 1
+      queue:
+        enabled: true
+      run_as:
+        service_principal_name: ${var.job_service_principal}
+      parameters:
+        - name: catalog_name
+          default: ${var.catalog_name}
+        - name: environment
+          default: ${var.environment}
+      tasks:
+        - task_key: smoke_test
+          notebook_task:
+            notebook_path: ../notebooks/ci/smoke_test.py
+            base_parameters:
+              catalog_name: "{{job.parameters.catalog_name}}"
+              environment: "{{job.parameters.environment}}"
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          timeout_seconds: 900
+      tags:
+        project: marketplace_lakehouse
+        environment: ${var.environment}
+        deployment: bundle

@@ -1,0 +1,32 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+.databricks/
+dist/
+build/
+*.egg-info/
+.idea/
+.vscode/
+.env
+.databrickscfg
+
+# Local environment files
+.env.*
+!.env.example
+
+# Azure and Databricks credentials
+.azure/
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Local configuration and temporary files
+*.local.json
+*.local.yml
+*.local.yaml
+*.log
+.DS_Store
+Thumbs.db

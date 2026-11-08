@@ -1,0 +1,43 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-24.04
+
+variables:
+  pythonVersion: "3.11"
+
+stages:
+  - stage: Quality
+    displayName: Pull request quality checks
+    jobs:
+      - job: quality
+        displayName: Lint and tests
+        steps:
+          - checkout: self
+            fetchDepth: 1
+
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: $(pythonVersion)
+
+          - bash: |
+              python -m pip install --upgrade pip
+              pip install -r requirements-dev.txt
+              pip install -e .
+            displayName: Install test dependencies
+
+          - bash: ruff check src tests scripts
+            displayName: Ruff lint
+
+          - bash: python scripts/validate_repo.py
+            displayName: Validate repository and secret hygiene
+
+          - bash: pytest -q --junitxml=$(Common.TestResultsDirectory)/pytest.xml
+            displayName: Run tests
+
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: JUnit
+              testResultsFiles: $(Common.TestResultsDirectory)/pytest.xml
+              failTaskOnFailedTests: true

@@ -1,0 +1,7 @@
+environment: dev
+catalog_name: marketplace_lab
+default_mode: incremental
+max_concurrent_runs: 1
+landing_root: /Volumes/marketplace_lab/bronze/landing
+checkpoint_root: /Volumes/marketplace_lab/ops/checkpoints/_autoloader/checkpoints
+schema_root: /Volumes/marketplace_lab/ops/checkpoints/_autoloader/schemas

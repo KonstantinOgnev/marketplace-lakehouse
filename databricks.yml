@@ -1,0 +1,43 @@
+bundle:
+  name: marketplace_lakehouse
+  databricks_cli_version: ">= 0.248.0"
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog_name:
+    description: Unity Catalog catalog used by the deployed environment
+    default: marketplace_lab
+  environment:
+    description: Logical deployment environment
+    default: dev
+  job_service_principal:
+    description: Application ID of the service principal used as Job Run as
+
+sync:
+  include:
+    - notebooks/**/*.py
+    - src/**/*.py
+    - config/*.yml
+  exclude:
+    - tests/**
+    - docs/**
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: ~/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog_name: marketplace_lab
+      environment: dev
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog_name: marketplace_prod
+      environment: prod
