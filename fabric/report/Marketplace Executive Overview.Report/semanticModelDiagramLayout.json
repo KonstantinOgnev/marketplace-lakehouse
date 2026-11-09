@@ -1,0 +1,178 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 633.77885361542576,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 2277.958659759719,
+            "y": 476.87192181872774
+          },
+          "nodeIndex": "dim_order",
+          "nodeLineageTag": "04173282-9f91-48c7-9a2f-5dbc24d56b3e",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 2556,
+            "y": 0
+          },
+          "nodeIndex": "fact_orders",
+          "nodeLineageTag": "0c0f1e29-0a35-4b07-9580-7ff885cc0a7d",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 11
+        },
+        {
+          "location": {
+            "x": 2840,
+            "y": 0
+          },
+          "nodeIndex": "fact_payments",
+          "nodeLineageTag": "a61c9c3e-0209-4d8a-af3c-d0a5e4dce325",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 0
+          },
+          "nodeIndex": "agg_conversion_funnel",
+          "nodeLineageTag": "1ac3fb66-4d0e-4367-bbd1-b98b7f83fbe6",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 284,
+            "y": 0
+          },
+          "nodeIndex": "agg_daily_marketplace",
+          "nodeLineageTag": "bcc99fc5-e7c6-4934-932d-16b438318770",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 9
+        },
+        {
+          "location": {
+            "x": 568,
+            "y": 0
+          },
+          "nodeIndex": "agg_daily_seller",
+          "nodeLineageTag": "2cc4303d-c7a7-4560-8e15-703a18f804fc",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 10
+        },
+        {
+          "location": {
+            "x": 852,
+            "y": 0
+          },
+          "nodeIndex": "dim_product",
+          "nodeLineageTag": "14e2da7a-308f-4d90-a207-be86407128a2",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 1136,
+            "y": 2
+          },
+          "nodeIndex": "dim_seller",
+          "nodeLineageTag": "90e12b04-ce6e-49de-8c7b-08ff65e312b7",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 1630.5393115100667,
+            "y": 0
+          },
+          "nodeIndex": "dim_user",
+          "nodeLineageTag": "a5ec3bbe-d8ca-422b-8d03-d2ed9f31d6ca",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 1910.5668716702539,
+            "y": 178.75979279156604
+          },
+          "nodeIndex": "fact_events",
+          "nodeLineageTag": "ba33deca-188f-42fb-a840-cb0879591891",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 1646.3701737761182,
+            "y": 520.38961901544792
+          },
+          "nodeIndex": "fact_order_items",
+          "nodeLineageTag": "1d290b4c-e609-4f46-8ef3-f2cd99600efb",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 2549.1951908168062,
+            "y": 770.30673909907023
+          },
+          "nodeIndex": "Funnel Transitions",
+          "nodeLineageTag": "ed2877c5-9b0b-4af4-bcaa-923144475aa7",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 12
+        }
+      ],
+      "name": "Все таблицы",
+      "zoomValue": 58.0293582557486,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Все таблицы",
+  "defaultDiagram": "Все таблицы"
+}

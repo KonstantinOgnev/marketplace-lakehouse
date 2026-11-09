@@ -1,0 +1,23 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "0673f8978c799b367952",
+  "displayName": "Страница 1",
+  "displayOption": "ActualSize",
+  "height": 2000,
+  "width": 3200,
+  "objects": {
+    "outspacePane": [
+      {
+        "properties": {
+          "width": {
+            "expr": {
+              "Literal": {
+                "Value": "392L"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

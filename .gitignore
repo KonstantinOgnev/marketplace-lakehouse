@@ -33,3 +33,10 @@ Thumbs.db
 
 # Local backups of exported configurations
 *.bak
+
+# Power BI Desktop local settings
+**/.pbi/
+**/*.pbix
+
+# Power BI live connection configuration (local only)
+**/*.Report/definition.pbir
