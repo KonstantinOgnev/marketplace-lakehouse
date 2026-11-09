@@ -50,3 +50,19 @@ databricks bundle run marketplace_smoke_test -t dev
 The initial bundle deliberately deploys only an isolated smoke-test Job. The
 existing `marketplace_lakehouse_daily` Job will be migrated and bound in a later
 step after the CI quality gate has passed.
+
+## Microsoft Fabric & Power BI Analytics
+
+The Marketplace Lakehouse project includes an analytical consumption layer built with Microsoft Fabric and Power BI.
+
+The solution extends Azure Databricks Bronze, Silver, and Gold data processing with:
+
+- Microsoft Fabric Lakehouse and SQL Analytics Endpoint.
+- A dimensional semantic model with 12 tables, 20 DAX measures, and 6 relationships.
+- A Power BI executive dashboard covering GMV, orders, AOV, revenue recognition, and seller performance.
+- Source-controlled Power BI report definitions (PBIP).
+- A sanitized TMDL snapshot for architecture and data-model inspection.
+
+**[Explore the Microsoft Fabric Analytics Layer](fabric/README.md)**
+
+The Fabric artifacts are provided for portfolio review. Restoring live connections requires a separately configured Fabric environment.
